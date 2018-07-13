@@ -1,0 +1,17 @@
+<h1>Hỏi đê</h1>
+
+<form action="/question/add" method="POST">
+
+    <textarea name="questionContent" maxlength="200" rows="6" id="question" onkeyup="dem()"></textarea>
+
+    <p id="thongbao">Còn 200/200 kí tự</p>
+    
+    <script type="text/javascript">
+        function dem() {
+            var input = document.getElementById("question");
+            document.getElementById("thongbao").innerHTML = "Còn " + (200 - input.value.length) + "/200 kí tự";
+        }
+    </script>
+
+    <button type="submit">Gửi</button>
+</form>
