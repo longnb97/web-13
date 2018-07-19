@@ -1,0 +1,17 @@
+<h1>Hỏi đê</h1>
+<form action="/question/add" method="POST">
+    <textarea name="questionContent" id="question" cols="30" rows="10" maxlength="200"></textarea>
+
+    <p>con
+        <span id="remain">200</span>/200 ký tự</p>
+
+
+    <button type="submit">Gui</button>
+</form>
+
+<script>
+    let char = 200;
+    document.getElementById("question").addEventListener("input", function () {
+        document.getElementById("remain").innerText = char - document.getElementById("question").value.length;
+    });
+</script>

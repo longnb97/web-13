@@ -1,0 +1,23 @@
+nav{
+    background-color: black;
+    text-decoration-color: white;
+    text-decoration-line: none;
+    height: 40px;
+    font-size: 20px;
+    line-height: 40px;
+}
+
+a{
+    display: inline-block;
+    width: 100px;
+    
+    text-align: center;
+    
+}
+
+a:hover{
+    background-color: white;
+    color: black;
+    text-decoration-line: none;
+    height: 40px;
+}
