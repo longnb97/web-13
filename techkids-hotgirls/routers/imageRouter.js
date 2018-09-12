@@ -1,25 +1,47 @@
-const express = require("express");
+const express = require("express")
 const imageRouter = express.Router();
 const ImageModel = require("../models/imageModel");
 
 imageRouter.get("/", function (req, res) {
-    ImageModel.find({}, function (err, Data) {
+    ImageModel.find({})
+    .populate("owner")
+    .populate('comments.user'," avatarUrl name")
+    .exec((err, imageFound)=>{
         if (err) res.status(500).send({ success: 0, err })
-        else if (!Data) console.log("khong tim thay");
-        else res.send({ success: 1, Data });
+        else res.send({ success: 1, imageFound })
+        
     })
 })
 
-imageRouter.post("/", function (req, res) {
-    const { user, view, like, comments, imageUrl, description, owner } = req.body;
-    newImage = {
-        user, view, like, comments, imageUrl, description, owner
-    }
-    ImageModel.create(newImage, function (err, imageCreated) {
-        if (err) res.status(500).send({ success: 0, err });
-        else res.status(201).send({ success: 1, imageCreated })
-    })
-});
+
+imageRouter.post("/", (req, res) => {
+    const { imageUrl, description, owner} = req.body;
+    console.log(req.body)
+    ImageModel.create(
+        { imageUrl, description, owner },
+        (err, imageCreated) => {
+            if (err) res.status(500).send({ success: 0, err })
+            else res.status(201).send({ success: 1, imageCreated })
+        })
+})
+
+// imageRouter.post("/comment/create/:imageId",async function(req, res){
+//     const {comments} = req.body;
+//     let imageFound = await ImageModel.findById(req.params.imageId)
+//     if(!imageFound) res.status(400).send({success:0 , message:"Image not Found"})
+//     else{
+//         ImageModel.create(
+//             {comments},
+//             (err, commentCreated) => {
+//                 if(err) res.status(500).send({success:0 , err})
+//                 else res.status(200).send({success:1 ,commentCreated})
+//             }
+//         )
+//     }
+
+// })
+
+
 
 imageRouter.get("/:imageId", function (req, res) {
     ImageModel.findById({ _id: req.params.imageId }, function (err, Data) {
@@ -29,18 +51,30 @@ imageRouter.get("/:imageId", function (req, res) {
     })
 })
 
-imageRouter.put("/:imageId", function (req, res) {
-    const { imageUrl, description } = req.body;
-    ImageModel.findById({ _id: req.params.imageId }, function (err, Data) {
-        if (err) console.log(err)
-        else if (!Data) console.log("ko tim thay");
+
+
+imageRouter.put("/:imageId", (req, res) => {
+    const { view, like, comments, description, owner } = req.body;
+    const updateInfo = { view, like, comments, description, owner }
+    ImageModel.findById(
+      req.params.imageId,
+      (err, imageFound) => {
+        if(err) res.status(500).send({ success: 0, err })
+        else if(!imageFound) res.status(404).send({ success: 0, message: "Image not exist!" })
         else {
-            if (req.body.imageUrl) Data.imageUrl = req.body.imageUrl;
-            if (req.body.description) Data.description = req.body.description;
-            Data.save(function (err) {
-                if (err) res.status(500).send({ success: 0, err })
-                else res.send({ success: 1, imageId: Data._id });
-            });
+          for(let key in updateInfo) {
+            if(updateInfo[key]) {
+              imageFound[key] = updateInfo[key];
+            }
+          }
+          imageFound.save((err, imageUpdated) => {
+            if(err) res.status(500).send({ success: 0, err })
+            else res.send({ success: 1, imageUpdated });
+          });
         }
-    })
-})
+      }
+    );
+  });
+
+
+module.exports = imageRouter;
